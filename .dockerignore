@@ -1,0 +1,7 @@
+target
+Dockerfile
+Dockerfile-dev
+docker-compose.yml
+.env
+.dockerignore
+.env.mongo

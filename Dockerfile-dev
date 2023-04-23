@@ -1,0 +1,38 @@
+# Use the official Rust image as the base image
+FROM rust:latest
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Install the necessary dependencies for building and debugging
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gdb \
+    lldb \
+    cmake \
+    pkg-config \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy the Cargo.toml and Cargo.lock files to the working directory
+COPY Cargo.toml Cargo.lock ./
+
+# Create a dummy main.rs file to build dependencies
+RUN mkdir src && \
+    echo "fn main() {println!(\"If you see this, the build failed!\");}" > src/main.rs
+
+# Build the dependencies
+RUN cargo build && \
+    rm -rf src && \
+    rm -f target/debug/deps/app*
+
+RUN cargo install cargo-watch
+
+# Copy the source code into the container
+COPY . .
+
+# Expose a default port for running and debugging the application
+EXPOSE 8000
+
+# Run the command to watch for changes and recompile the code
+CMD ["cargo", "watch", "-x", "run"]

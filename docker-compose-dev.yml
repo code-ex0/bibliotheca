@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    volumes:
+      - "./mongo/data:/data/db"
+    ports:
+      - 27017:27017
+    restart: always
+    env_file:
+      - .env.mongo
+    networks:
+      - bibliotheca
+
+  bibliotheca:
+    image: bibliotheca-dev:1.0.0
+    container_name: bibliotheca-dev
+    ports:
+      - 8000:8000
+    restart: always
+    depends_on:
+      - mongo
+    env_file:
+      - .env
+    networks:
+      - bibliotheca
+    volumes:
+      - ./src:/usr/src/app/src
+
+networks:
+  bibliotheca:
+
